@@ -37,6 +37,25 @@ if __name__ == "__main__":
             continue
         if user_input == "tiuq":
             break
-        response = llm.invoke(user_input)
-        print(response.content)
+        for chunk in llm.stream(user_input):
+            print(chunk.content, end="", flush=True)
+        print() 
+    human_message = HumanMessage(content=user_text)
+    context_message = [*messages,human_message]
+
+    print("助手:",end="",flush=True)
+    response = llm.invoke(context_message):
+    for chunk in llm.stream(context_message):
+        if chunk.content:
+            print(chunk.content,end="",flush=True)
+    print()
+    
+    assistant_text = "".join(reply_parts)
+    assistant_message = AIMessage(content=assistant_text)
+    
+    messages.append(human_message)
+    messages.append(assistant_message)
+    
+    
+    )
     
