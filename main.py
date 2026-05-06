@@ -1,7 +1,7 @@
 from openai import api_key
 import os
 from langchain_openai import ChatOpenAI
-
+from langchain_core.messages import AIMessage, HumanMessage
 from dotenv import load_dotenv
 load_dotenv()
 def main():
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         api_key=os.getenv("OPENAI_API_KEY", "sk-12345678"),
         temperature=0.7,
     )
-    response = llm.invoke("你好，請自我介紹")
+    messages = []
     while True:   
         user_input = input("You: ")
         if user_input == "":
@@ -40,22 +40,24 @@ if __name__ == "__main__":
         for chunk in llm.stream(user_input):
             print(chunk.content, end="", flush=True)
         print() 
-    human_message = HumanMessage(content=user_text)
-    context_message = [*messages,human_message]
 
-    print("助手:",end="",flush=True)
-    response = llm.invoke(context_message):
-    for chunk in llm.stream(context_message):
-        if chunk.content:
-            print(chunk.content,end="",flush=True)
-    print()
+        human_message = HumanMessage(content=user_input)
+        context_message = [*messages,human_message]
+
+        print("助手:",end="",flush=True)
+        reply_parts:list[str] = []
+        for chunk in llm.stream(context_message):
+            if chunk.content:
+                print(chunk.content,end="",flush=True)
+                reply_parts.append(chunk.content)
+        print()
+        
+        assistant_text = "".join(reply_parts)
+        assistant_message = AIMessage(content=assistant_text)
+        
+        messages.append(human_message)
+        messages.append(assistant_message)
     
-    assistant_text = "".join(reply_parts)
-    assistant_message = AIMessage(content=assistant_text)
-    
-    messages.append(human_message)
-    messages.append(assistant_message)
     
     
-    )
     
